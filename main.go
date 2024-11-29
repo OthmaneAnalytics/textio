@@ -16,6 +16,10 @@ func main() {
 	age := 21
 	messageEnd := "years old"
 	fmt.Println(messageStart, age, messageEnd)
+	numMessagesFromDoris := 72
+	costPerMessage := .02
+	totalCost := costPerMessage * float64(numMessagesFromDoris)
+	fmt.Printf("Doris spent %.2f on text messages today\n", totalCost)
 
 }
 
