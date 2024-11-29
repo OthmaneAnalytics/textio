@@ -20,6 +20,12 @@ func main() {
 	costPerMessage := .02
 	totalCost := costPerMessage * float64(numMessagesFromDoris)
 	fmt.Printf("Doris spent %.2f on text messages today\n", totalCost)
-
+	fmt.Println("The compiled textio server is starting")
+	accountAgeFloat := 2.6
+	fmt.Println("Your account has existed for", int64(accountAgeFloat), "years")
+	var username2 string = "presidentSkroob"
+	var password string = "12345"
+	// don't edit below this line
+	fmt.Println("Authorization: Basic", username2+":"+password)
 }
 
