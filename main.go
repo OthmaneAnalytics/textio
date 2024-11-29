@@ -12,5 +12,10 @@ func main() {
 	var username string
 	username = ""
 	fmt.Printf("%v %.2f %v %q\n", smsSendingLimit, costPerSMS, hasPermission, username)
+	messageStart := "Happy birthday! you are now"
+	age := 21
+	messageEnd := "years old"
+	fmt.Println(messageStart, age, messageEnd)
+
 }
 
