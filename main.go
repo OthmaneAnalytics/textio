@@ -60,4 +60,14 @@ func main() {
 	fmt.Printf("constant 'name' rune length: %d\n", utf8.RuneCountInString(name3))
 	fmt.Println("=====================================")
 	fmt.Printf("Hi %s, so good to have you back in the arcanum\n", name3)
+	var startup string = "Textio SMS service booting up..."
+	var message1 string = "Sending test message"
+	var confirmation string = "Message sent!"
+
+	// don't touch below this line
+
+	fmt.Println(startup)
+	fmt.Println(message1)
+	fmt.Println(confirmation)
 }
+
