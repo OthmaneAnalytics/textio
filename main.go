@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"unicode/utf8"
+)
+
 
 func main() {
 	var smsSendingLimit int
@@ -51,4 +55,9 @@ func main() {
 
 	fmt.Print(msg)
 
+	const name3 = "🐻"
+	fmt.Printf("constant 'name' byte length: %d\n", len(name3))
+	fmt.Printf("constant 'name' rune length: %d\n", utf8.RuneCountInString(name3))
+	fmt.Println("=====================================")
+	fmt.Printf("Hi %s, so good to have you back in the arcanum\n", name3)
 }
