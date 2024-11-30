@@ -79,6 +79,20 @@ func main() {
 	// don't edit below this line
 	fmt.Printf("The type of penniesPerText is %T\n", penniesPerText)
 
+	fname := "Dalinar"
+	lname := "Kholin"
+	age4 := 45
+	messageRate := 0.5
+	isSubscribed := false
+	message4 := "Sometimes a hypocrite is nothing more than a man in the process of changing."
+
+	// Don't touch above this line
+
+	userLog := fmt.Sprintf("Name: %v %v, Age: %v, Rate: %v, Is Subscribed: %f, Message: %v", fname, lname, age4, messageRate, isSubscribed, message4)
+
+	// Don't touch below this line
+
+	fmt.Println(userLog)
 
 }
 
