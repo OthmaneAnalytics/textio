@@ -43,4 +43,12 @@ func main() {
 
 	// don't edit below this line
 	fmt.Println("number of seconds in an hour:", secondsInHour)
+	const name = "Saul Goodman"
+	const openRate = 30.5
+	msg := fmt.Sprintf("Hi %s, your open rate is %0.1f percent\n",name , openRate)
+
+	// don't edit below this line
+
+	fmt.Print(msg)
+
 }
