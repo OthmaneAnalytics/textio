@@ -69,5 +69,11 @@ func main() {
 	fmt.Println(startup)
 	fmt.Println(message1)
 	fmt.Println(confirmation)
+	senderName := "Syl"
+	recipient := "Kaladin"
+	message := "The Words, Kaladin. You have to speak the Words!"
+
+	fmt.Printf("%s to %s: %s\n", senderName, recipient, message)
+
 }
 
