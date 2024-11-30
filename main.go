@@ -74,6 +74,11 @@ func main() {
 	message := "The Words, Kaladin. You have to speak the Words!"
 
 	fmt.Printf("%s to %s: %s\n", senderName, recipient, message)
+	var penniesPerText float64 = 2
+
+	// don't edit below this line
+	fmt.Printf("The type of penniesPerText is %T\n", penniesPerText)
+
 
 }
 
