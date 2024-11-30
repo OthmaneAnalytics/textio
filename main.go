@@ -27,5 +27,7 @@ func main() {
 	var password string = "12345"
 	// don't edit below this line
 	fmt.Println("Authorization: Basic", username2+":"+password)
-}
+	averageOpenRate, displayMessage := .23, "is the average open rate of your messages"
 
+	fmt.Println(averageOpenRate, displayMessage)
+}
