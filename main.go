@@ -1,10 +1,22 @@
 package main
 
 import (
-	"fmt"
 	"unicode/utf8"
+	"fmt"
 )
 
+func getMonthlyPrice(tier string) int {
+	switch tier {
+		case "basic":
+			return 10000
+		case "premium":
+			return 15000
+		case "enterprise":
+			return 50000
+		default:
+			return 0
+	}
+}
 func concat(s1 string, s2 string) string {
 	return s1 + s2
 }
@@ -112,7 +124,7 @@ func main() {
 
 	// Don't touch above this line
 
-	userLog := fmt.Sprintf("Name: %v %v, Age: %v, Rate: %v, Is Subscribed: %f, Message: %v", fname, lname, age4, messageRate, isSubscribed, message4)
+	userLog := fmt.Sprintf("Name: %v %v, Age: %v, Rate: %v, Is Subscribed: %v, Message: %v", fname, lname, age4, messageRate, isSubscribed, message4)
 
 	// Don't touch below this line
 
