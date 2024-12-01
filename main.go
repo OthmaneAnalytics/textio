@@ -5,6 +5,29 @@ import (
 	"fmt"
 )
 
+
+func printReports(intro, body, outro string) {
+	printCostReport(func(s string) int {
+		return 2*len(s)
+	},intro) 
+	printCostReport(func(s string) int {
+		return 3*len(s)
+	},body)
+	printCostReport(func(s string) int {
+		return 4*len(s)
+	},outro)
+}
+
+// don't touch below this line
+
+
+func printCostReport(costCalculator func(string) int, message string) {
+	cost := costCalculator(message)
+	fmt.Printf(`Message: "%s" Cost: %v cents`, message, cost)
+	fmt.Println()
+}
+
+
 func reformat(message string, formatter func(string) string) string {
 	return "TEXTIO: " + formatter(formatter(formatter(message)))
 }
@@ -209,5 +232,10 @@ func main() {
 	test("Lane,", " happy birthday!")
 	test("Elon,", " hope that Tesla thing works out")
 	test("Go", " is fantastic")
+	printReports(
+		"Welcome to the Hotel California",
+		"Such a lovely place",
+		"Plenty of room at the Hotel California",
+	)
 }
 
