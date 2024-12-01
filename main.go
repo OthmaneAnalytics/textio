@@ -5,6 +5,11 @@ import (
 	"fmt"
 )
 
+func reformat(message string, formatter func(string) string) string {
+	return "TEXTIO: " + formatter(formatter(formatter(message)))
+}
+
+
 func yearsUntilEvents(age int) (yearsUntilAdult, yearsUntilDrinking, yearsUntilCarRental int) {
 	yearsUntilAdult = 18 - age
 	if yearsUntilAdult < 0 {

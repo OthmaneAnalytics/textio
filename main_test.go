@@ -7,20 +7,18 @@ import (
 
 func Test(t *testing.T) {
 	type testCase struct {
-		age                   int
-		exYearsUntilAdult     int
-		exYearsUntilDrinking  int
-		exYearsUntilCarRental int
+		message       string
+		formatter     func(string) string
+		formatterName string
+		expected      string
 	}
 	tests := []testCase{
-		{4, 14, 17, 21},
-		{18, 0, 3, 7},
-		{22, 0, 0, 3},
+		{"hello", addExclamation, "addExclamation", "TEXTIO: hello!!!"},
+		{"hello there", addPeriod, "addPeriod", "TEXTIO: hello there..."},
 	}
 	if withSubmit {
 		tests = append(tests, []testCase{
-			{25, 0, 0, 0},
-			{35, 0, 0, 0},
+			{"moor der ehT", reverseString, "reverseString", "TEXTIO: The red room"},
 		}...)
 	}
 
@@ -28,29 +26,43 @@ func Test(t *testing.T) {
 	failCount := 0
 
 	for _, test := range tests {
-		yearsUntilAdult, yearsUntilDrinking, yearsUntilCarRental := yearsUntilEvents(test.age)
-		if yearsUntilAdult != test.exYearsUntilAdult ||
-			yearsUntilDrinking != test.exYearsUntilDrinking ||
-			yearsUntilCarRental != test.exYearsUntilCarRental {
+		output := reformat(test.message, test.formatter)
+		if output != test.expected {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     (%v)
-Expecting:  (%v, %v, %v)
-Actual:     (%v, %v, %v)
-Fail`, test.age, test.exYearsUntilAdult, test.exYearsUntilDrinking, test.exYearsUntilCarRental, yearsUntilAdult, yearsUntilDrinking, yearsUntilCarRental)
+Inputs:     (%v, %v)
+Expecting:  %v
+Actual:     %v
+Fail`, test.message, test.formatterName, test.expected, output)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     (%v)
-Expecting:  (%v, %v, %v)
-Actual:     (%v, %v, %v)
+Inputs:     (%v, %v)
+Expecting:  %v
+Actual:     %v
 Pass
-`, test.age, test.exYearsUntilAdult, test.exYearsUntilDrinking, test.exYearsUntilCarRental, yearsUntilAdult, yearsUntilDrinking, yearsUntilCarRental)
+`, test.message, test.formatterName, test.expected, output)
 		}
 	}
 
 	fmt.Println("---------------------------------")
 	fmt.Printf("%d passed, %d failed\n", passCount, failCount)
+}
+
+func addPeriod(s string) string {
+	return s + "."
+}
+
+func addExclamation(s string) string {
+	return s + "!"
+}
+
+func reverseString(s string) string {
+	r := []rune(s)
+	for i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return string(r)
 }
 
 // withSubmit is set at compile time depending
