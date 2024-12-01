@@ -7,19 +7,16 @@ import (
 
 func Test(t *testing.T) {
 	type testCase struct {
-		costPerSend  int
-		numLastMonth int
-		numThisMonth int
-		expected     int
+		tier     string
+		expected string
 	}
 	tests := []testCase{
-		{2, 89, 102, 26},
-		{2, 98, 104, 12},
+		{"basic", "You get 1,000 texts per month for $30 per month."},
+		{"premium", "You get 50,000 texts per month for $60 per month."},
 	}
 	if withSubmit {
 		tests = append(tests, []testCase{
-			{3, 50, 40, -30},
-			{3, 60, 60, 0},
+			{"enterprise", "You get unlimited texts per month for $100 per month."},
 		}...)
 	}
 
@@ -27,23 +24,22 @@ func Test(t *testing.T) {
 	failCount := 0
 
 	for _, test := range tests {
-		output := monthlyBillIncrease(test.costPerSend, test.numLastMonth, test.numThisMonth)
-		_ = getBillForMonth(0, 0)
+		output := getProductMessage(test.tier)
 		if output != test.expected {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     (%v, %v, %v)
+Inputs:     (%v)
 Expecting:  %v
 Actual:     %v
-Fail`, test.costPerSend, test.numLastMonth, test.numThisMonth, test.expected, output)
+Fail`, test.tier, test.expected, output)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     (%v, %v, %v)
+Inputs:     (%v)
 Expecting:  %v
 Actual:     %v
 Pass
-`, test.costPerSend, test.numLastMonth, test.numThisMonth, test.expected, output)
+`, test.tier, test.expected, output)
 		}
 	}
 
