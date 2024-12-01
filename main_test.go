@@ -20,6 +20,7 @@ func Test(t *testing.T) {
 	if withSubmit {
 		tests = append(tests, []testCase{
 			{25, 0, 0, 0},
+			{35, 0, 0, 0},
 		}...)
 	}
 
