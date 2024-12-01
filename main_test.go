@@ -7,16 +7,19 @@ import (
 
 func Test(t *testing.T) {
 	type testCase struct {
-		tier     string
-		expected string
+		age                   int
+		exYearsUntilAdult     int
+		exYearsUntilDrinking  int
+		exYearsUntilCarRental int
 	}
 	tests := []testCase{
-		{"basic", "You get 1,000 texts per month for $30 per month."},
-		{"premium", "You get 50,000 texts per month for $60 per month."},
+		{4, 14, 17, 21},
+		{18, 0, 3, 7},
+		{22, 0, 0, 3},
 	}
 	if withSubmit {
 		tests = append(tests, []testCase{
-			{"enterprise", "You get unlimited texts per month for $100 per month."},
+			{25, 0, 0, 0},
 		}...)
 	}
 
@@ -24,22 +27,24 @@ func Test(t *testing.T) {
 	failCount := 0
 
 	for _, test := range tests {
-		output := getProductMessage(test.tier)
-		if output != test.expected {
+		yearsUntilAdult, yearsUntilDrinking, yearsUntilCarRental := yearsUntilEvents(test.age)
+		if yearsUntilAdult != test.exYearsUntilAdult ||
+			yearsUntilDrinking != test.exYearsUntilDrinking ||
+			yearsUntilCarRental != test.exYearsUntilCarRental {
 			failCount++
 			t.Errorf(`---------------------------------
 Inputs:     (%v)
-Expecting:  %v
-Actual:     %v
-Fail`, test.tier, test.expected, output)
+Expecting:  (%v, %v, %v)
+Actual:     (%v, %v, %v)
+Fail`, test.age, test.exYearsUntilAdult, test.exYearsUntilDrinking, test.exYearsUntilCarRental, yearsUntilAdult, yearsUntilDrinking, yearsUntilCarRental)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
 Inputs:     (%v)
-Expecting:  %v
-Actual:     %v
+Expecting:  (%v, %v, %v)
+Actual:     (%v, %v, %v)
 Pass
-`, test.tier, test.expected, output)
+`, test.age, test.exYearsUntilAdult, test.exYearsUntilDrinking, test.exYearsUntilCarRental, yearsUntilAdult, yearsUntilDrinking, yearsUntilCarRental)
 		}
 	}
 
