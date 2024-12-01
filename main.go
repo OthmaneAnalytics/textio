@@ -5,6 +5,52 @@ import (
 	"fmt"
 )
 
+func bootup() {
+	defer fmt.Println("TEXTIO BOOTUP DONE")
+	ok := connectToDB()
+	if !ok {
+		return
+	}
+	ok = connectToPaymentProvider()
+	if !ok {
+		return
+	}
+	fmt.Println("All systems ready!")
+}
+
+// don't touch below this line
+
+var shouldConnectToDB = true
+
+func connectToDB() bool {
+	fmt.Println("Connecting to database...")
+	if shouldConnectToDB {
+		fmt.Println("Connected!")
+		return true
+	}
+	fmt.Println("Connection failed")
+	return false
+}
+
+var shouldConnectToPaymentProvider = true
+
+func connectToPaymentProvider() bool {
+	fmt.Println("Connecting to payment provider...")
+	if shouldConnectToPaymentProvider {
+		fmt.Println("Connected!")
+		return true
+	}
+	fmt.Println("Connection failed")
+	return false
+}
+
+func test(dbSuccess, paymentSuccess bool) {
+	shouldConnectToDB = dbSuccess
+	shouldConnectToPaymentProvider = paymentSuccess
+	bootup()
+	fmt.Println("====================================")
+}
+
 
 func printReports(intro, body, outro string) {
 	printCostReport(func(s string) int {
@@ -99,13 +145,9 @@ func concat(s1 string, s2 string) string {
 	return s1 + s2
 }
 
-// don't touch below this line
 
 
 
-func test(s1 string, s2 string) {
-	fmt.Println(concat(s1, s2))
-}
 
 func billingCost(plan string) float64 {
 	switch plan {
@@ -229,13 +271,14 @@ func main() {
 	plan = "unknown"
 	fmt.Printf("The cost for a %s plan is $%.2f\n", plan, billingCost(plan))
 
-	test("Lane,", " happy birthday!")
-	test("Elon,", " hope that Tesla thing works out")
-	test("Go", " is fantastic")
 	printReports(
 		"Welcome to the Hotel California",
 		"Such a lovely place",
 		"Plenty of room at the Hotel California",
 	)
+	test(true, true)
+	test(false, true)
+	test(true, false)
+	test(false, false)
 }
 
