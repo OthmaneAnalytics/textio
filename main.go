@@ -16,6 +16,11 @@ type user struct {
 	number int
 }
 
+type sender struct {
+	user
+	rateLimit int
+}
+
 func canSendMessage(mToSend messageToSend) bool {
 	if mToSend.sender.number == 0 || mToSend.sender.name =="" || mToSend.recipient.number == 0 || mToSend.recipient.name == "" {
 	return false
