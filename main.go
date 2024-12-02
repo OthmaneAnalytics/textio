@@ -5,6 +5,15 @@ import (
 	"fmt"
 )
 
+type authenticationInfo struct {
+	username string
+	password string
+}
+
+func (a authenticationInfo) getBasicAuth() string {
+	return fmt.Sprintf("Authorization: Basic %v:%v", a.username, a.password)
+}
+
 type messageToSend struct {
 	message   string
 	sender    user

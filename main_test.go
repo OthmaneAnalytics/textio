@@ -5,92 +5,41 @@ import (
 	"testing"
 )
 
-func getSenderLog(s sender) string {
-	return fmt.Sprintf(`
-====================================
-Sender name: %v
-Sender number: %v
-Sender rateLimit: %v
-====================================
-`, s.name, s.number, s.rateLimit)
-}
-
-func Test(t *testing.T) {
-	type testCase struct {
-		rateLimit int
-		name      string
-		number    int
-		expected  string
-	}
-	tests := []testCase{
-		{
-			10000,
-			"Deborah",
-			18055558790,
-			`
-====================================
-Sender name: Deborah
-Sender number: 18055558790
-Sender rateLimit: 10000
-====================================
-`,
-		},
-		{
-			5000,
-			"Jason",
-			18055558791,
-			`
-====================================
-Sender name: Jason
-Sender number: 18055558791
-Sender rateLimit: 5000
-====================================
-`,
-		},
+func TestGetBasicAuth(t *testing.T) {
+	tests := []struct {
+		auth     authenticationInfo
+		expected string
+	}{
+		{authenticationInfo{"Google", "12345"}, "Authorization: Basic Google:12345"},
+		{authenticationInfo{"Bing", "98765"}, "Authorization: Basic Bing:98765"},
 	}
 	if withSubmit {
-		tests = append(tests, []testCase{
-			{
-				1000,
-				"Jill",
-				18055558792,
-				`
-====================================
-Sender name: Jill
-Sender number: 18055558792
-Sender rateLimit: 1000
-====================================
-`,
-			},
-		}...)
+		tests = append(tests, struct {
+			auth     authenticationInfo
+			expected string
+		}{authenticationInfo{"DDG", "76921"}, "Authorization: Basic DDG:76921"})
 	}
 
 	passCount := 0
 	failCount := 0
 
 	for _, test := range tests {
-		output := getSenderLog(sender{
-			rateLimit: test.rateLimit,
-			user: user{
-				name:   test.name,
-				number: test.number,
-			},
-		})
+		output := test.auth.getBasicAuth()
 		if output != test.expected {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     (%v, %v, %v)
-Expecting:  %v
-Actual:     %v
-Fail`, test.rateLimit, test.name, test.number, test.expected, output)
+Inputs:     %+v
+Expecting:  %s
+Actual:     %s
+Fail`, test.auth, test.expected, output)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     (%v, %v, %v)
-Expecting:  %v
-Actual:     %v
+Inputs:     %+v
+Expecting:  %s
+Actual:     %s
 Pass
-`, test.rateLimit, test.name, test.number, test.expected, output)
+`, test.auth, test.expected, output)
 		}
 	}
 
