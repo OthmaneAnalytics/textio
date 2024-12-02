@@ -2,44 +2,51 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
-func TestGetBasicAuth(t *testing.T) {
-	tests := []struct {
-		auth     authenticationInfo
-		expected string
-	}{
-		{authenticationInfo{"Google", "12345"}, "Authorization: Basic Google:12345"},
-		{authenticationInfo{"Bing", "98765"}, "Authorization: Basic Bing:98765"},
+func Test(t *testing.T) {
+	type testCase struct {
+		name     string
+		expected uintptr
+	}
+
+	tests := []testCase{
+		{"contact", uintptr(24)},
 	}
 	if withSubmit {
-		tests = append(tests, struct {
-			auth     authenticationInfo
-			expected string
-		}{authenticationInfo{"DDG", "76921"}, "Authorization: Basic DDG:76921"})
+		tests = append(tests, testCase{"perms", uintptr(16)})
 	}
 
 	passCount := 0
 	failCount := 0
 
 	for _, test := range tests {
-		output := test.auth.getBasicAuth()
-		if output != test.expected {
+		var typ reflect.Type
+		if test.name == "contact" {
+			typ = reflect.TypeOf(contact{})
+		} else if test.name == "perms" {
+			typ = reflect.TypeOf(perms{})
+		}
+
+		size := typ.Size()
+
+		if size != test.expected {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     %+v
-Expecting:  %s
-Actual:     %s
-Fail`, test.auth, test.expected, output)
+Inputs:     (%v)
+Expecting:  %v bytes
+Actual:     %v bytes
+Fail`, test.name, test.expected, size)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     %+v
-Expecting:  %s
-Actual:     %s
+Inputs:     (%v)
+Expecting:  %v bytes
+Actual:     %v bytes
 Pass
-`, test.auth, test.expected, output)
+`, test.name, test.expected, size)
 		}
 	}
 
