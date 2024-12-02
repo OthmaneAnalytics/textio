@@ -5,20 +5,25 @@ import (
 	"testing"
 )
 
-func TestSplitEmail(t *testing.T) {
+func getMessageText(m messageToSend) string {
+	return fmt.Sprintf("Sending message: '%s' to: %v", m.message, m.recipient.number)
+}
+
+func Test(t *testing.T) {
 	type testCase struct {
-		email    string
-		username string
-		domain   string
+		phoneNumber int
+		message     string
+		expected    string
 	}
 	tests := []testCase{
-		{"drogon@dragonstone.com", "drogon", "dragonstone.com"},
-		{"rhaenyra@targaryen.com", "rhaenyra", "targaryen.com"},
+		{148255510981, "Thanks for signing up", "Sending message: 'Thanks for signing up' to: 148255510981"},
+		{148255510982, "Love to have you aboard!", "Sending message: 'Love to have you aboard!' to: 148255510982"},
 	}
 	if withSubmit {
 		tests = append(tests, []testCase{
-			{"viserys@kingslanding.com", "viserys", "kingslanding.com"},
-			{"aegon@stormsend.com", "aegon", "stormsend.com"},
+			{148255510983, "We're so excited to have you", "Sending message: 'We're so excited to have you' to: 148255510983"},
+			{148255510984, "", "Sending message: '' to: 148255510984"},
+			{148255510985, "Hello, World!", "Sending message: 'Hello, World!' to: 148255510985"},
 		}...)
 	}
 
@@ -26,22 +31,25 @@ func TestSplitEmail(t *testing.T) {
 	failCount := 0
 
 	for _, test := range tests {
-		username, domain := splitEmail(test.email)
-		if username != test.username || domain != test.domain {
+		output := getMessageText(messageToSend{
+			re: test.recipient.number,
+			message:     test.message,
+		})
+		if output != test.expected {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     (%v)
-Expecting:  (%v, %v)
-Actual:     (%v, %v)
-Fail`, test.email, test.username, test.domain, username, domain)
+Inputs:     (%v, %v)
+Expecting:  %v
+Actual:     %v
+Fail`, test.phoneNumber, test.message, test.expected, output)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     (%v)
-Expecting:  (%v, %v)
-Actual:     (%v, %v)
+Inputs:     (%v, %v)
+Expecting:  %v
+Actual:     %v
 Pass
-`, test.email, test.username, test.domain, username, domain)
+`, test.phoneNumber, test.message, test.expected, output)
 		}
 	}
 
