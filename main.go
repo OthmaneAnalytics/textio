@@ -5,6 +5,25 @@ import (
 	"fmt"
 )
 
+type messageToSend struct {
+	phoneNumber int
+	message string
+}
+
+
+func splitEmail(email string) (string, string) {
+	username, domain := "", ""
+	for i, r := range email {
+		if r == '@' {
+			username = email[:i]
+			domain = email[i+1:]
+			break
+		}
+	}
+	return username, domain
+}
+
+
 func bootup() {
 	defer fmt.Println("TEXTIO BOOTUP DONE")
 	ok := connectToDB()
