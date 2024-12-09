@@ -7,15 +7,14 @@ import (
 )
 
 func getExpenseReport(e expense) (string, float64) {
-	c, ok := e.(email)
-	if ok {
-		return c.toAddress, c.cost()
+	switch c := e.(type){
+		case email:
+			return c.toAddress, c.cost()
+		case sms:
+			return c.toPhoneNumber, c.cost()
+		default:
+			return "", 0.0
 	}
-	d, ok := e.(sms)
-	if ok {
-		return d.toPhoneNumber, d.cost()
-	}
-	return "", 0.0
 }
 
 // don't touch below this line
