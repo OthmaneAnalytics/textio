@@ -7,6 +7,14 @@ import (
 	"errors"
 )
 
+func bulkSend(numMessages int) float64 {
+	s := 0.0
+	for i := 0 ; i< numMessages; i++{
+		s += 1.0 + float64(i)*0.01
+	}
+	return s
+}
+
 func divide(x, y float64) (float64, error) {
 	if y == 0 {
 		return 0, errors.New("no dividing by 0")
