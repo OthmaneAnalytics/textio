@@ -7,6 +7,49 @@ import (
 	"errors"
 )
 
+func printPrimes(max int) {
+	for n := 2; n <=max; n++{ 
+		if n == 2 {
+			fmt.Println(n)
+		} else if n % 2 == 0 {
+			continue
+		} else {
+			prime := true
+			for i:= 2; i*i <= n; i++ {
+				if n % i == 0 {
+					prime = false
+					break
+				}
+			}
+			if prime {
+				fmt.Println(n)
+			}
+		}
+	}
+}
+
+func test(max int) {
+	fmt.Printf("Primes up to %v:\n", max)
+	printPrimes(max)
+	fmt.Println("===============================================================")
+}
+
+
+func fizzbuzz() {
+	for i := 1; i<=100 ; i++{
+		if i % 15 == 0 {
+			fmt.Println("fizzbuzz")
+		} else if i % 5 == 0 {
+			fmt.Println("buss")
+		} else if i % 3 == 0 {
+			fmt.Println("fizz")
+		} else {
+			fmt.Println(i)
+		} 
+	}
+}
+
+
 func getMaxMessagesToSend(costMultiplier float64, maxCostInPennies int) int {
 	actualCostInPennies := 1.0
 	maxMessagesToSend := 1
@@ -317,14 +360,6 @@ func connectToPaymentProvider() bool {
 	return false
 }
 
-func test(dbSuccess, paymentSuccess bool) {
-	shouldConnectToDB = dbSuccess
-	shouldConnectToPaymentProvider = paymentSuccess
-	bootup()
-	fmt.Println("====================================")
-}
-
-
 func printReports(intro, body, outro string) {
 	printCostReport(func(s string) int {
 		return 2*len(s)
@@ -549,9 +584,8 @@ func main() {
 		"Such a lovely place",
 		"Plenty of room at the Hotel California",
 	)
-	test(true, true)
-	test(false, true)
-	test(true, false)
-	test(false, false)
+	fizzbuzz()
+
+	test(50)
 }
 
