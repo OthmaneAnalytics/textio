@@ -7,56 +7,19 @@ import (
 
 func Test(t *testing.T) {
 	type testCase struct {
-		expense      expense
-		expectedTo   string
-		expectedCost float64
+		msgToCustomer string
+		msgToSpouse   string
+		expectedCost  int
+		expectedErr   error
 	}
 	tests := []testCase{
-		{
-			email{isSubscribed: true, body: "Whoa there!", toAddress: "soldier@monty.com"},
-			"soldier@monty.com",
-			0.11,
-		},
-		{
-			sms{isSubscribed: false, body: "Halt! Who goes there?", toPhoneNumber: "+155555509832"},
-			"+155555509832",
-			2.1,
-		},
+		{"Thanks for coming in to our flower shop today!", "We hope you enjoyed your gift.", 0, fmt.Errorf("can't send texts over 25 characters")},
+		{"Thanks for joining us!", "Have a good day.", 76, nil},
 	}
 	if withSubmit {
 		tests = append(tests, []testCase{
-			{
-				email{
-					isSubscribed: false,
-					body:         "It is I, Arthur, son of Uther Pendragon, from the castle of Camelot. King of the Britons, defeator of the Saxons, sovereign of all England!",
-					toAddress:    "soldier@monty.com",
-				},
-				"soldier@monty.com",
-				6.95,
-			},
-			{
-				email{
-					isSubscribed: true,
-					body:         "Pull the other one!",
-					toAddress:    "arthur@monty.com",
-				},
-				"arthur@monty.com",
-				0.19,
-			},
-			{
-				sms{
-					isSubscribed:  true,
-					body:          "I am. And this my trusty servant Patsy.",
-					toPhoneNumber: "+155555509832",
-				},
-				"+155555509832",
-				1.17,
-			},
-			{
-				invalid{},
-				"",
-				0.0,
-			},
+			{"Thank you.", "Enjoy!", 32, nil},
+			{"We loved having you in!", "We hope the rest of your evening is fantastic.", 0, fmt.Errorf("can't send texts over 25 characters")},
 		}...)
 	}
 
@@ -64,22 +27,30 @@ func Test(t *testing.T) {
 	failCount := 0
 
 	for _, test := range tests {
-		to, cost := getExpenseReport(test.expense)
-		if to != test.expectedTo || cost != test.expectedCost {
+		cost, err := sendSMSToCouple(test.msgToCustomer, test.msgToSpouse)
+		errString := ""
+		if err != nil {
+			errString = err.Error()
+		}
+		expectedErrString := ""
+		if test.expectedErr != nil {
+			expectedErrString = test.expectedErr.Error()
+		}
+		if cost != test.expectedCost || errString != expectedErrString {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     %+v
+Inputs:     (%v, %v)
 Expecting:  (%v, %v)
 Actual:     (%v, %v)
-Fail`, test.expense, test.expectedTo, test.expectedCost, to, cost)
+Fail`, test.msgToCustomer, test.msgToSpouse, test.expectedCost, test.expectedErr, cost, err)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     %+v
+Inputs:     (%v, %v)
 Expecting:  (%v, %v)
 Actual:     (%v, %v)
 Pass
-`, test.expense, test.expectedTo, test.expectedCost, to, cost)
+`, test.msgToCustomer, test.msgToSpouse, test.expectedCost, test.expectedErr, cost, err)
 		}
 	}
 

@@ -6,6 +6,29 @@ import (
 	"time"
 )
 
+func sendSMSToCouple(msgToCustomer, msgToSpouse string) (int, error) {
+	i1, err1 := sendSMS(msgToCustomer)
+	if err1 != nil {
+		return 0, err1
+	}
+	i2, err2 := sendSMS(msgToSpouse)
+	if err2 != nil {
+		return 0, err2
+	}
+	return i1 + i2, nil
+}
+
+// don't edit below this line
+
+func sendSMS(message string) (int, error) {
+	const maxTextLen = 25
+	const costPerChar = 2
+	if len(message) > maxTextLen {
+		return 0, fmt.Errorf("can't send texts over %v characters", maxTextLen)
+	}
+	return costPerChar * len(message), nil
+}
+
 func getExpenseReport(e expense) (string, float64) {
 	switch c := e.(type){
 		case email:
