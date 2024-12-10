@@ -7,6 +7,18 @@ import (
 	"errors"
 )
 
+
+func maxMessages(thresh int) int {	
+	s := 0
+	for i := 0 ; ; i++{
+		s += 100 + i
+		if s > thresh{
+			return i	
+		}
+	}
+}
+
+
 func bulkSend(numMessages int) float64 {
 	s := 0.0
 	for i := 0 ; i< numMessages; i++{
