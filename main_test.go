@@ -2,49 +2,81 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 )
 
 func Test(t *testing.T) {
 	type testCase struct {
-		messages         []string
-		expectedMessages [3]string
-		expectedCosts    [3]int
+		plan             string
+		messages         [3]string
+		expectedMessages []string
+		expectedErr      string
 	}
 	tests := []testCase{
 		{
-			[]string{
-				"Hello sir/madam can I interest you in a yacht?",
-				"Please I'll even give you an Amazon gift card?",
-				"You're missing out big time",
-			},
+			planFree,
 			[3]string{
 				"Hello sir/madam can I interest you in a yacht?",
 				"Please I'll even give you an Amazon gift card?",
 				"You're missing out big time",
 			},
-			[3]int{46, 92, 119},
+			[]string{"Hello sir/madam can I interest you in a yacht?", "Please I'll even give you an Amazon gift card?"},
+			"",
 		},
 		{
-			[]string{"It's the spring fling sale!", "Don't miss this event!", "Last chance."},
-			[3]string{"It's the spring fling sale!", "Don't miss this event!", "Last chance."},
-			[3]int{27, 49, 61},
+			planPro,
+			[3]string{
+				"Hello sir/madam can I interest you in a yacht?",
+				"Please I'll even give you an Amazon gift card?",
+				"You're missing out big time",
+			},
+			[]string{
+				"Hello sir/madam can I interest you in a yacht?",
+				"Please I'll even give you an Amazon gift card?",
+				"You're missing out big time",
+			},
+			"",
 		},
 	}
 	if withSubmit {
 		tests = append(tests, []testCase{
 			{
-				[]string{
-					"Put that coffee down!",
-					"Coffee is for closers",
-					"Always be closing",
-				},
+				planFree,
 				[3]string{
-					"Put that coffee down!",
-					"Coffee is for closers",
-					"Always be closing",
+					"You can get a good look at a T-bone by sticking your head up a bull's ass, but wouldn't you rather take the butcher's word for it?",
+					"Wouldn't you?",
+					"Wouldn't you???",
 				},
-				[3]int{21, 42, 59},
+				[]string{
+					"You can get a good look at a T-bone by sticking your head up a bull's ass, but wouldn't you rather take the butcher's word for it?",
+					"Wouldn't you?",
+				},
+				"",
+			},
+			{
+				planPro,
+				[3]string{
+					"You can get a good look at a T-bone by sticking your head up a bull's ass, but wouldn't you rather take the butcher's word for it?",
+					"Wouldn't you?",
+					"Wouldn't you???",
+				},
+				[]string{
+					"You can get a good look at a T-bone by sticking your head up a bull's ass, but wouldn't you rather take the butcher's word for it?",
+					"Wouldn't you?",
+					"Wouldn't you???",
+				},
+				"",
+			},
+			{
+				"invalid plan",
+				[3]string{
+					"You can get a good look at a T-bone by sticking your head up a bull's ass, but wouldn't you rather take the butcher's word for it?",
+					"Wouldn't you?",
+					"Wouldn't you???",
+				},
+				nil,
+				"unsupported plan",
 			},
 		}...)
 	}
@@ -53,40 +85,41 @@ func Test(t *testing.T) {
 	failCount := 0
 
 	for _, test := range tests {
-		actualMessages, actualCosts := getMessageWithRetries(test.messages[0], test.messages[1], test.messages[2])
-		if actualMessages[0] != test.expectedMessages[0] ||
-			actualMessages[1] != test.expectedMessages[1] ||
-			actualMessages[2] != test.expectedMessages[2] ||
-			actualCosts[0] != test.expectedCosts[0] ||
-			actualCosts[1] != test.expectedCosts[1] ||
-			actualCosts[2] != test.expectedCosts[2] {
+		actualMessages, err := getMessageWithRetriesForPlan(test.plan, test.messages)
+		errString := ""
+		if err != nil {
+			errString = err.Error()
+		}
+		if !slices.Equal(actualMessages, test.expectedMessages) || errString != test.expectedErr {
 			failCount++
 			t.Errorf(`---------------------------------
 Test Failed:
-Inputs:
+Plan: %v
+Messages:
 %v
 Expecting:
 %v
-%v
+errString:  %v
 Actual:
 %v
-%v
+errString:  %v
 Fail
-`, sliceWithBullets(test.messages), sliceWithBullets(test.expectedMessages[:]), test.expectedCosts, sliceWithBullets(actualMessages[:]), actualCosts)
+`, test.plan, sliceWithBullets(test.messages[:]), sliceWithBullets(test.expectedMessages), test.expectedErr, sliceWithBullets(actualMessages), errString)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
 Test Passed:
-Inputs:
+Plan: %v
+Messages:
 %v
 Expecting:
 %v
-%v
+errString:  %v
 Actual:
 %v
-%v
+errString:  %v
 Pass
-`, sliceWithBullets(test.messages), sliceWithBullets(test.expectedMessages[:]), test.expectedCosts, sliceWithBullets(actualMessages[:]), actualCosts)
+`, test.plan, sliceWithBullets(test.messages[:]), sliceWithBullets(test.expectedMessages), test.expectedErr, sliceWithBullets(actualMessages), errString)
 		}
 	}
 
@@ -95,11 +128,17 @@ Pass
 }
 
 func sliceWithBullets[T any](slice []T) string {
+	if slice == nil {
+		return "  <nil>"
+	}
+	if len(slice) == 0 {
+		return "  []"
+	}
 	output := ""
 	for i, item := range slice {
-		form := "  - %v\n"
+		form := "  - %#v\n"
 		if i == (len(slice) - 1) {
-			form = "  - %v"
+			form = "  - %#v"
 		}
 		output += fmt.Sprintf(form, item)
 	}
