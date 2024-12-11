@@ -17,15 +17,14 @@ func getCostsByDay(costs []cost) []float64 {
 	if len(costs) == 0 {
 		return nil
 	} else {
-		cpd = make([]float64,1)
-		for i := 0;i< len(costs); i++{
-			if len(cpd) < costs[i].day {
-				for j := 0; j< costs[i].day - len(cpd); j++{
-					cpd = append(cpd, 0)
-				}
-				cpd = append(cpd, costs[i].value)
-			} else {
+		cpd := make([]float64,1)
+		for i := 0; i< len(costs); i++{
+			if costs[i].day < len(cpd) {
 				cpd[costs[i].day] += costs[i].value
+			} else {
+				rest := make( []float64 , costs[i].day + 1 - len( cpd ) )
+				rest[ len(rest)-1 ] = costs[i].value
+				cpd = append( cpd , rest... )
 			}
 		}
 		return cpd
