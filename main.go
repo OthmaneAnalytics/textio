@@ -7,6 +7,19 @@ import (
 	"errors"
 )
 
+func indexOfFirstBadWord(msg []string, badWords []string) int {
+	index := -1
+	for i, element := range msg {
+		for _, bad := range badWords {
+			if element == bad && index == -1 {
+				index = i
+				break
+			}
+		}
+	}
+	return index
+}
+
 func createMatrix(rows, cols int) [][]int {
 	mat := make([][]int,rows)
 	for i := 0; i < rows; i++{
