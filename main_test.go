@@ -7,20 +7,45 @@ import (
 
 func Test(t *testing.T) {
 	type testCase struct {
-		costMultiplier   float64
-		maxCostInPennies int
-		expected         int
+		messages         []string
+		expectedMessages [3]string
+		expectedCosts    [3]int
 	}
 	tests := []testCase{
-		{1.1, 5, 4},
-		{1.3, 10, 5},
-		{1.35, 25, 7},
+		{
+			[]string{
+				"Hello sir/madam can I interest you in a yacht?",
+				"Please I'll even give you an Amazon gift card?",
+				"You're missing out big time",
+			},
+			[3]string{
+				"Hello sir/madam can I interest you in a yacht?",
+				"Please I'll even give you an Amazon gift card?",
+				"You're missing out big time",
+			},
+			[3]int{46, 92, 119},
+		},
+		{
+			[]string{"It's the spring fling sale!", "Don't miss this event!", "Last chance."},
+			[3]string{"It's the spring fling sale!", "Don't miss this event!", "Last chance."},
+			[3]int{27, 49, 61},
+		},
 	}
 	if withSubmit {
 		tests = append(tests, []testCase{
-			{1.2, 1, 1},
-			{1.2, 15, 7},
-			{1.3, 20, 7},
+			{
+				[]string{
+					"Put that coffee down!",
+					"Coffee is for closers",
+					"Always be closing",
+				},
+				[3]string{
+					"Put that coffee down!",
+					"Coffee is for closers",
+					"Always be closing",
+				},
+				[3]int{21, 42, 59},
+			},
 		}...)
 	}
 
@@ -28,27 +53,57 @@ func Test(t *testing.T) {
 	failCount := 0
 
 	for _, test := range tests {
-		output := getMaxMessagesToSend(test.costMultiplier, test.maxCostInPennies)
-		if output != test.expected {
+		actualMessages, actualCosts := getMessageWithRetries(test.messages[0], test.messages[1], test.messages[2])
+		if actualMessages[0] != test.expectedMessages[0] ||
+			actualMessages[1] != test.expectedMessages[1] ||
+			actualMessages[2] != test.expectedMessages[2] ||
+			actualCosts[0] != test.expectedCosts[0] ||
+			actualCosts[1] != test.expectedCosts[1] ||
+			actualCosts[2] != test.expectedCosts[2] {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     (%v, %v)
-Expecting:  %v
-Actual:     %v
-Fail`, test.costMultiplier, test.maxCostInPennies, test.expected, output)
+Test Failed:
+Inputs:
+%v
+Expecting:
+%v
+%v
+Actual:
+%v
+%v
+Fail
+`, sliceWithBullets(test.messages), sliceWithBullets(test.expectedMessages[:]), test.expectedCosts, sliceWithBullets(actualMessages[:]), actualCosts)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     (%v, %v)
-Expecting:  %v
-Actual:     %v
+Test Passed:
+Inputs:
+%v
+Expecting:
+%v
+%v
+Actual:
+%v
+%v
 Pass
-`, test.costMultiplier, test.maxCostInPennies, test.expected, output)
+`, sliceWithBullets(test.messages), sliceWithBullets(test.expectedMessages[:]), test.expectedCosts, sliceWithBullets(actualMessages[:]), actualCosts)
 		}
 	}
 
 	fmt.Println("---------------------------------")
 	fmt.Printf("%d passed, %d failed\n", passCount, failCount)
+}
+
+func sliceWithBullets[T any](slice []T) string {
+	output := ""
+	for i, item := range slice {
+		form := "  - %v\n"
+		if i == (len(slice) - 1) {
+			form = "  - %v"
+		}
+		output += fmt.Sprintf(form, item)
+	}
+	return output
 }
 
 // withSubmit is set at compile time depending on which button is used to run the tests
