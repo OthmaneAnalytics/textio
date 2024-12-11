@@ -8,6 +8,30 @@ import (
 )
 
 
+type cost struct {
+	day   int
+	value float64
+}
+
+func getCostsByDay(costs []cost) []float64 {
+	if len(costs) == 0 {
+		return nil
+	} else {
+		cpd = make([]float64,1)
+		for i := 0;i< len(costs); i++{
+			if len(cpd) < costs[i].day {
+				for j := 0; j< costs[i].day - len(cpd); j++{
+					cpd = append(cpd, 0)
+				}
+				cpd = append(cpd, costs[i].value)
+			} else {
+				cpd[costs[i].day] += costs[i].value
+			}
+		}
+		return cpd
+	}
+}
+
 func sum(nums ...int) int {
 	sum := 0
 	for i := 0; i< len(nums); i++{
