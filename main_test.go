@@ -2,82 +2,32 @@ package main
 
 import (
 	"fmt"
-	"slices"
 	"testing"
 )
 
 func Test(t *testing.T) {
 	type testCase struct {
-		plan             string
-		messages         [3]string
-		expectedMessages []string
-		expectedErr      string
+		messages    []string
+		expected    []float64
+		expectedCap int
 	}
 	tests := []testCase{
 		{
-			planFree,
-			[3]string{
-				"Hello sir/madam can I interest you in a yacht?",
-				"Please I'll even give you an Amazon gift card?",
-				"You're missing out big time",
-			},
-			[]string{"Hello sir/madam can I interest you in a yacht?", "Please I'll even give you an Amazon gift card?"},
-			"",
+			[]string{"Welcome to the movies!", "Enjoy your popcorn!"},
+			[]float64{0.22, 0.19},
+			2,
 		},
 		{
-			planPro,
-			[3]string{
-				"Hello sir/madam can I interest you in a yacht?",
-				"Please I'll even give you an Amazon gift card?",
-				"You're missing out big time",
-			},
-			[]string{
-				"Hello sir/madam can I interest you in a yacht?",
-				"Please I'll even give you an Amazon gift card?",
-				"You're missing out big time",
-			},
-			"",
+			[]string{"I don't want to be here anymore", "Can we go home?", "I'm hungry", "I'm bored"},
+			[]float64{0.31, 0.15, 0.1, 0.09},
+			4,
 		},
 	}
 	if withSubmit {
 		tests = append(tests, []testCase{
-			{
-				planFree,
-				[3]string{
-					"You can get a good look at a T-bone by sticking your head up a bull's ass, but wouldn't you rather take the butcher's word for it?",
-					"Wouldn't you?",
-					"Wouldn't you???",
-				},
-				[]string{
-					"You can get a good look at a T-bone by sticking your head up a bull's ass, but wouldn't you rather take the butcher's word for it?",
-					"Wouldn't you?",
-				},
-				"",
-			},
-			{
-				planPro,
-				[3]string{
-					"You can get a good look at a T-bone by sticking your head up a bull's ass, but wouldn't you rather take the butcher's word for it?",
-					"Wouldn't you?",
-					"Wouldn't you???",
-				},
-				[]string{
-					"You can get a good look at a T-bone by sticking your head up a bull's ass, but wouldn't you rather take the butcher's word for it?",
-					"Wouldn't you?",
-					"Wouldn't you???",
-				},
-				"",
-			},
-			{
-				"invalid plan",
-				[3]string{
-					"You can get a good look at a T-bone by sticking your head up a bull's ass, but wouldn't you rather take the butcher's word for it?",
-					"Wouldn't you?",
-					"Wouldn't you???",
-				},
-				nil,
-				"unsupported plan",
-			},
+			{[]string{}, []float64{}, 0},
+			{[]string{""}, []float64{0}, 1},
+			{[]string{"Hello", "Hi", "Hey"}, []float64{0.05, 0.02, 0.03}, 3},
 		}...)
 	}
 
@@ -85,41 +35,33 @@ func Test(t *testing.T) {
 	failCount := 0
 
 	for _, test := range tests {
-		actualMessages, err := getMessageWithRetriesForPlan(test.plan, test.messages)
-		errString := ""
-		if err != nil {
-			errString = err.Error()
-		}
-		if !slices.Equal(actualMessages, test.expectedMessages) || errString != test.expectedErr {
+		output := getMessageCosts(test.messages)
+		if !slicesEqual(output, test.expected) || cap(output) != test.expectedCap {
 			failCount++
 			t.Errorf(`---------------------------------
 Test Failed:
-Plan: %v
-Messages:
 %v
 Expecting:
 %v
-errString:  %v
+expected cap: %v
 Actual:
 %v
-errString:  %v
+actual cap: %v
 Fail
-`, test.plan, sliceWithBullets(test.messages[:]), sliceWithBullets(test.expectedMessages), test.expectedErr, sliceWithBullets(actualMessages), errString)
+`, sliceWithBullets(test.messages), sliceWithBullets(test.expected), test.expectedCap, sliceWithBullets(output), cap(output))
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
 Test Passed:
-Plan: %v
-Messages:
 %v
 Expecting:
 %v
-errString:  %v
+expected cap: %v
 Actual:
 %v
-errString:  %v
+actual cap: %v
 Pass
-`, test.plan, sliceWithBullets(test.messages[:]), sliceWithBullets(test.expectedMessages), test.expectedErr, sliceWithBullets(actualMessages), errString)
+`, sliceWithBullets(test.messages), sliceWithBullets(test.expected), test.expectedCap, sliceWithBullets(output), cap(output))
 		}
 	}
 
@@ -143,6 +85,18 @@ func sliceWithBullets[T any](slice []T) string {
 		output += fmt.Sprintf(form, item)
 	}
 	return output
+}
+
+func slicesEqual(a, b []float64) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // withSubmit is set at compile time depending on which button is used to run the tests
