@@ -7,6 +7,17 @@ import (
 	"errors"
 )
 
+func createMatrix(rows, cols int) [][]int {
+	mat := make([][]int,rows)
+	for i := 0; i < rows; i++{
+		mat[i] = make([]int,cols)
+		for j := 0 ; j < cols; j++{
+			mat[i][j] = i*j
+		}
+	}
+	return mat
+}
+
 
 type cost struct {
 	day   int

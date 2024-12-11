@@ -8,99 +8,32 @@ import (
 
 func Test(t *testing.T) {
 	type testCase struct {
-		costs    []cost
-		expected []float64
+		rows, cols int
+		expected   [][]int
 	}
 	tests := []testCase{
-		{
-			costs: []cost{
-				{0, 1.0},
-				{1, 2.0},
-				{1, 3.1},
-				{5, 2.5},
-				{2, 3.6},
-				{1, 2.7},
-				{1, 3.3},
-			},
-			expected: []float64{
-				1.0,
-				11.1,
-				3.6,
-				0.0,
-				0.0,
-				2.5,
-			},
-		},
+		{3, 3, [][]int{
+			{0, 0, 0},
+			{0, 1, 2},
+			{0, 2, 4},
+		}},
+		{4, 4, [][]int{
+			{0, 0, 0, 0},
+			{0, 1, 2, 3},
+			{0, 2, 4, 6},
+			{0, 3, 6, 9},
+		}},
 	}
-
 	if withSubmit {
 		tests = append(tests, []testCase{
-			{
-				costs: []cost{
-					{0, 1.0},
-					{1, 2.0},
-					{1, 3.1},
-					{2, 2.5},
-					{3, 3.1},
-					{3, 2.6},
-					{4, 3.34},
-				},
-				expected: []float64{
-					1.0,
-					5.1,
-					2.5,
-					5.7,
-					3.34,
-				},
-			},
-			{
-				costs: []cost{
-					{0, 1.0},
-					{10, 2.0},
-					{3, 3.1},
-					{2, 2.5},
-					{1, 3.6},
-					{2, 2.7},
-					{4, 56.34},
-					{13, 2.34},
-					{28, 1.34},
-					{25, 2.34},
-					{30, 4.34},
-				},
-				expected: []float64{
-					1.0,
-					3.6,
-					5.2,
-					3.1,
-					56.34,
-					0.0,
-					0.0,
-					0.0,
-					0.0,
-					0.0,
-					2.0,
-					0.0,
-					0.0,
-					2.34,
-					0.0,
-					0.0,
-					0.0,
-					0.0,
-					0.0,
-					0.0,
-					0.0,
-					0.0,
-					0.0,
-					0.0,
-					0.0,
-					2.34,
-					0.0,
-					0.0,
-					1.34,
-					0.0,
-					4.34,
-				},
-			},
+			{5, 7, [][]int{
+				{0, 0, 0, 0, 0, 0, 0},
+				{0, 1, 2, 3, 4, 5, 6},
+				{0, 2, 4, 6, 8, 10, 12},
+				{0, 3, 6, 9, 12, 15, 18},
+				{0, 4, 8, 12, 16, 20, 24},
+			}},
+			{0, 0, [][]int{}},
 		}...)
 	}
 
@@ -108,27 +41,27 @@ func Test(t *testing.T) {
 	failCount := 0
 
 	for _, test := range tests {
-		output := getCostsByDay(test.costs)
+		output := createMatrix(test.rows, test.cols)
 		if !reflect.DeepEqual(output, test.expected) {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:
-%v
+Test Failed: %v x %v matrix
 Expecting:
 %v
 Actual:
 %v
-Fail`, sliceWithBullets(test.costs), sliceWithBullets(test.expected), sliceWithBullets(output))
+Fail
+`, test.rows, test.cols, formatMatrix(test.expected), formatMatrix(output))
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     %v
+Test Passed: %v x %v matrix
 Expecting:
 %v
 Actual:
 %v
 Pass
-`, sliceWithBullets(test.costs), sliceWithBullets(test.expected), sliceWithBullets(output))
+`, test.rows, test.cols, formatMatrix(test.expected), formatMatrix(output))
 		}
 	}
 
@@ -136,24 +69,14 @@ Pass
 	fmt.Printf("%d passed, %d failed\n", passCount, failCount)
 }
 
-func sliceWithBullets[T any](slice []T) string {
-	if slice == nil {
-		return "  <nil>"
-	}
-	if len(slice) == 0 {
-		return "  []"
-	}
-	output := ""
-	for i, item := range slice {
-		form := "  - %v\n"
-		if i == (len(slice) - 1) {
-			form = "  - %v"
-		}
-		output += fmt.Sprintf(form, item)
-	}
-	return output
-}
-
 // withSubmit is set at compile time depending on which button is used to run the tests
 var withSubmit = true
+
+func formatMatrix(matrix [][]int) string {
+	var result string
+	for _, row := range matrix {
+		result += fmt.Sprintf("%v\n", row)
+	}
+	return result
+}
 
