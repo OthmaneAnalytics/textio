@@ -9,7 +9,21 @@ import (
 
 
 func getNameCounts(names []string) map[rune]map[string]int {
-	
+	data := map[rune]map[string]int{}
+	for i := 0 ; i < len(names); i++ {
+		runes := []rune(names[i])
+		if _, ok1 := data[runes[0]]; ok1 {
+			if _, ok2 := data[runes[0]][names[i]]; ok2 {
+				data[runes[0]][names[i]]++
+			} else {
+			data[runes[0]][names[i]] = 1
+			}
+		} else {
+			nmap := map[string]int{names[i]: 1}
+			data[runes[0]] = nmap
+		}
+	}
+	return data
 }
 
 func getCounts(messagedUsers []string, validUsers map[string]int) {
