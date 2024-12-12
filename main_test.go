@@ -5,53 +5,41 @@ import (
 	"testing"
 )
 
-func Test(t *testing.T) {
-	type testCase struct {
-		msg      []string
-		badWords []string
-		expected int
-	}
-	tests := []testCase{
-		{[]string{"hey", "there", "john"}, []string{"crap", "shoot", "frick", "dang"}, -1},
-		{[]string{"ugh", "oh", "my", "frick"}, []string{"crap", "shoot", "frick", "dang"}, 3},
+func TestGetBasicAuth(t *testing.T) {
+	tests := []struct {
+		auth     authenticationInfo
+		expected string
+	}{
+		{authenticationInfo{"Google", "12345"}, "Authorization: Basic Google:12345"},
+		{authenticationInfo{"Bing", "98765"}, "Authorization: Basic Bing:98765"},
 	}
 	if withSubmit {
-		tests = append(tests, []testCase{
-			{[]string{"what", "the", "shoot", "I", "hate", "that", "crap"}, []string{"crap", "shoot", "frick", "dang"}, 2},
-			{[]string{"crap", "shoot", "frick", "dang"}, []string{""}, -1},
-			{[]string{""}, nil, -1},
-		}...)
+		tests = append(tests, struct {
+			auth     authenticationInfo
+			expected string
+		}{authenticationInfo{"DDG", "76921"}, "Authorization: Basic DDG:76921"})
 	}
 
 	passCount := 0
 	failCount := 0
 
 	for _, test := range tests {
-		output := indexOfFirstBadWord(test.msg, test.badWords)
+		output := test.auth.getBasicAuth()
 		if output != test.expected {
 			failCount++
 			t.Errorf(`---------------------------------
-Test Failed:
-message:
-%v
-bad words:
-%v
-Expecting:  %v
-Actual:     %v
-Fail
-`, sliceWithBullets(test.msg), sliceWithBullets(test.badWords), test.expected, output)
+Inputs:     %+v
+Expecting:  %s
+Actual:     %s
+Fail`, test.auth, test.expected, output)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Test Passed:
-message:
-%v
-bad words:
-%v
-Expecting:  %v
-Actual:     %v
+Inputs:     %+v
+Expecting:  %s
+Actual:     %s
 Pass
-`, sliceWithBullets(test.msg), sliceWithBullets(test.badWords), test.expected, output)
+`, test.auth, test.expected, output)
 		}
 	}
 
@@ -59,24 +47,7 @@ Pass
 	fmt.Printf("%d passed, %d failed\n", passCount, failCount)
 }
 
-func sliceWithBullets[T any](slice []T) string {
-	if slice == nil {
-		return "  <nil>"
-	}
-	if len(slice) == 0 {
-		return "  []"
-	}
-	output := ""
-	for i, item := range slice {
-		form := "  - %#v\n"
-		if i == (len(slice) - 1) {
-			form = "  - %#v"
-		}
-		output += fmt.Sprintf(form, item)
-	}
-	return output
-}
-
-// withSubmit is set at compile time depending on which button is used to run the tests
+// withSubmit is set at compile time depending
+// on which button is used to run the tests
 var withSubmit = true
 

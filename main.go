@@ -7,6 +7,26 @@ import (
 	"errors"
 )
 
+func getUserMap(names []string, phoneNumbers []int) (map[string]user, error) {
+	if len(names) != len(phoneNumbers) {
+		return nil, errors.New("invalide sizes")
+	}
+	userMap := make(map[string]user)
+	for i:= 0; i < len(names); i++ {
+		userMap[names[i]] = user{
+			name : names[i], 
+			phoneNumber : phoneNumbers[i],
+		}
+	}
+	return userMap, nil
+}
+
+type user struct {
+	name        string
+	phoneNumber int
+}
+
+
 func indexOfFirstBadWord(msg []string, badWords []string) int {
 	index := -1
 	for i, element := range msg {
@@ -376,22 +396,12 @@ type messageToSend struct {
 	recipient user
 }
 
-type user struct {
-	name   string
-	number int
-}
 
 type sender struct {
 	user
 	rateLimit int
 }
 
-func canSendMessage(mToSend messageToSend) bool {
-	if mToSend.sender.number == 0 || mToSend.sender.name =="" || mToSend.recipient.number == 0 || mToSend.recipient.name == "" {
-	return false
-	}
-	return true
-}
 
 
 func splitEmail(email string) (string, string) {
