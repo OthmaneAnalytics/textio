@@ -7,6 +7,25 @@ import (
 	"errors"
 )
 
+
+func deleteIfNecessary(users map[string]user, name string) (deleted bool, err error) {
+	elem, ok := users[name]
+	if !ok {
+		return false, errors.New("not found")
+	} else if !elem.scheduledForDeletion {
+		return false, nil
+	} else {
+		delete(users, name)
+		return true, nil
+	}
+}
+
+type user struct {
+	name                 string
+	number               int
+	scheduledForDeletion bool
+}
+/*
 func getUserMap(names []string, phoneNumbers []int) (map[string]user, error) {
 	if len(names) != len(phoneNumbers) {
 		return nil, errors.New("invalide sizes")
@@ -20,11 +39,7 @@ func getUserMap(names []string, phoneNumbers []int) (map[string]user, error) {
 	}
 	return userMap, nil
 }
-
-type user struct {
-	name        string
-	phoneNumber int
-}
+*/
 
 
 func indexOfFirstBadWord(msg []string, badWords []string) int {
