@@ -9,6 +9,20 @@ import (
 )
 
 
+func (e *email) setMessage(newMessage string) {
+	e.message = newMessage
+}
+
+// don't edit below this line
+
+type email struct {
+	message     string
+	fromAddress string
+	toAddress   string
+}
+
+
+
 func removeProfanity(message *string) {
 	if message == nil {
 		return
@@ -317,16 +331,6 @@ func sendSMS(message string) (int, error) {
 	return costPerChar * len(message), nil
 }
 
-func getExpenseReport(e expense) (string, float64) {
-	switch c := e.(type){
-		case email:
-			return c.toAddress, c.cost()
-		case sms:
-			return c.toPhoneNumber, c.cost()
-		default:
-			return "", 0.0
-	}
-}
 
 // don't touch below this line
 
@@ -334,11 +338,6 @@ type expense interface {
 	cost() float64
 }
 
-type email struct {
-	isSubscribed bool
-	body         string
-	toAddress    string
-}
 
 type sms struct {
 	isSubscribed  bool
@@ -348,12 +347,6 @@ type sms struct {
 
 type invalid struct{}
 
-func (e email) cost() float64 {
-	if !e.isSubscribed {
-		return float64(len(e.body)) * .05
-	}
-	return float64(len(e.body)) * .01
-}
 
 func (s sms) cost() float64 {
 	if !s.isSubscribed {
@@ -368,12 +361,6 @@ func (i invalid) cost() float64 {
 
 
 
-func (e email) format() string {
-	if e.isSubscribed {
-		return "'"+ e.body +"'" + " | " + "Subscribed"
-	}
-	return "'"+ e.body +"'" + " | " + "Not Subscribed"
-}
 
 
 type formatter interface {
