@@ -8,6 +8,19 @@ import (
 	"strings"
 )
 
+
+func removeProfanity(message *string) {
+	if message == nil {
+		return
+	}
+	messageVal := *message
+	messageVal = strings.ReplaceAll(messageVal, "fubb", "****")
+	messageVal = strings.ReplaceAll(messageVal, "shiz", "****")
+	messageVal = strings.ReplaceAll(messageVal, "witch", "*****")
+	*message = messageVal
+}
+
+
 type Analytics struct {
 	MessagesTotal     int
 	MessagesFailed    int
@@ -28,13 +41,6 @@ func getMessageText(data *Analytics, msg Message){
 	}
 }
 
-
-func removeProfanity(message *string) {
-	*message = strings.ReplaceAll(*message,"fubb","****")
-
-	*message = strings.ReplaceAll(*message,"shiz","****")	
-	*message = strings.ReplaceAll(*message,"witch","*****")
-}
 
 
 
