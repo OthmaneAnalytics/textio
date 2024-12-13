@@ -7,6 +7,17 @@ import (
 	"errors"
 )
 
+type Message struct {
+	Recipient string
+	Text      string
+}
+
+func getMessageText(m Message) string {
+	return fmt.Sprintf(`
+To: %v
+Message: %v
+`, m.Recipient, m.Text)
+}
 
 func getNameCounts(names []string) map[rune]map[string]int {
 	data := map[rune]map[string]int{}
