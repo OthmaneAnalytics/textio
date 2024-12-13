@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+func test(text string) {
+	fmt.Println(text)
+}
+
 
 func (e *email) setMessage(newMessage string) {
 	e.message = newMessage
@@ -223,12 +227,6 @@ func printPrimes(max int) {
 			}
 		}
 	}
-}
-
-func test(max int) {
-	fmt.Printf("Primes up to %v:\n", max)
-	printPrimes(max)
-	fmt.Println("===============================================================")
 }
 
 
@@ -746,6 +744,8 @@ func main() {
 	)
 	fizzbuzz()
 
-	test(50)
+	test("starting Mailio server")
+	test("stopping Mailio server")
+
 }
 
