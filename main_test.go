@@ -2,51 +2,29 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 )
 
 func Test(t *testing.T) {
 	type testCase struct {
-		recipient string
-		text      string
+		messageIn string
 		expected  string
 	}
 	tests := []testCase{
 		{
-			recipient: "Honey Bunny",
-			text:      "I love you, Pumpkin.",
-			expected: `
-To: Honey Bunny
-Message: I love you, Pumpkin.
-`,
+			"English, motherfubber, do you speak it?",
+			"English, mother****er, do you speak it?",
 		},
 		{
-			recipient: "Pumpkin",
-			text:      "I love you, Honey Bunny.",
-			expected: `
-To: Pumpkin
-Message: I love you, Honey Bunny.
-`,
+			"Oh man I've seen some crazy ass shiz in my time...",
+			"Oh man I've seen some crazy ass **** in my time...",
 		},
 	}
 	if withSubmit {
 		tests = append(tests, []testCase{
 			{
-				recipient: "poor sap 1",
-				text:      "And you will know My name is the Lord when I lay My vengeance upon thee.",
-				expected: `
-To: poor sap 1
-Message: And you will know My name is the Lord when I lay My vengeance upon thee.
-`,
-			},
-			{
-				recipient: "Fabienne",
-				text:      "Zed's dead, baby. Zed's dead.",
-				expected: `
-To: Fabienne
-Message: Zed's dead, baby. Zed's dead.
-`,
+				"Does he look like a witch?",
+				"Does he look like a *****?",
 			},
 		}...)
 	}
@@ -55,39 +33,35 @@ Message: Zed's dead, baby. Zed's dead.
 	failCount := 0
 
 	for _, test := range tests {
-		m := Message{Recipient: test.recipient, Text: test.text}
-		messageText := getMessageText(m)
-		if strings.TrimSpace(messageText) != strings.TrimSpace(test.expected) {
+		original := test.messageIn
+		removeProfanity(&test.messageIn)
+		if test.messageIn != test.expected {
 			failCount++
 			t.Errorf(`Test Failed:
 input:
-* Recipient: %v
-* Text: %v
+%v
 expected:
 %v
 actual:
 %v
 `,
-				m.Recipient,
-				m.Text,
+				original,
 				test.expected,
-				messageText,
+				test.messageIn,
 			)
 		} else {
 			passCount++
 			fmt.Printf(`Test Passed:
-input:
-* Recipient: %v
-* Text: %v
-expected:
+  input:
 %v
-actual:
+  expected:
+%v
+  actual:
 %v
 `,
-				m.Recipient,
-				m.Text,
+				original,
 				test.expected,
-				messageText,
+				test.messageIn,
 			)
 		}
 		fmt.Println("------------------------------")
