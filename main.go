@@ -8,6 +8,27 @@ import (
 	"strings"
 )
 
+type Analytics struct {
+	MessagesTotal     int
+	MessagesFailed    int
+	MessagesSucceeded int
+}
+
+type Message struct {
+	Recipient string
+	Success   bool
+}
+
+func getMessageText(data *Analytics, msg Message){
+	data.MessagesTotal++
+	if msg.Success {
+		data.MessagesSucceeded++	
+	} else {
+		data.MessagesFailed++
+	}
+}
+
+
 func removeProfanity(message *string) {
 	*message = strings.ReplaceAll(*message,"fubb","****")
 
@@ -15,17 +36,7 @@ func removeProfanity(message *string) {
 	*message = strings.ReplaceAll(*message,"witch","*****")
 }
 
-type Message struct {
-	Recipient string
-	Text      string
-}
 
-func getMessageText(m Message) string {
-	return fmt.Sprintf(`
-To: %v
-Message: %v
-`, m.Recipient, m.Text)
-}
 
 func getNameCounts(names []string) map[rune]map[string]int {
 	data := map[rune]map[string]int{}
