@@ -2,23 +2,24 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 )
 
 func Test(t *testing.T) {
 	type testCase struct {
-		numBatches int
-		expected   int
+		n        int
+		expected []int
 	}
 	tests := []testCase{
-		{3, 114},
-		{4, 198},
+		{5, []int{0, 1, 1, 2, 3}},
+		{3, []int{0, 1, 1}},
 	}
 	if withSubmit {
 		tests = append(tests, []testCase{
-			{0, 0},
-			{1, 15},
-			{6, 435},
+			{0, []int{}},
+			{1, []int{0}},
+			{7, []int{0, 1, 1, 2, 3, 5, 8}},
 		}...)
 	}
 
@@ -26,27 +27,25 @@ func Test(t *testing.T) {
 	failCount := 0
 
 	for _, test := range tests {
-		numSentCh := make(chan int)
-		go sendReports(test.numBatches, numSentCh)
-		output := countReports(numSentCh)
-		if output != test.expected {
+		actual := concurrentFib(test.n)
+		if !slices.Equal(actual, test.expected) {
 			failCount++
 			t.Errorf(`
 ---------------------------------
 Test Failed:
-  numBatches: %v
-  expected:   %v
-  actual:     %v
-`, test.numBatches, test.expected, output)
+  n:        %v
+  expected: %v
+  actual:   %v
+`, test.n, test.expected, actual)
 		} else {
 			passCount++
 			fmt.Printf(`
 ---------------------------------
 Test Passed:
-  numBatches: %v
-  expected:   %v
-  actual:     %v
-`, test.numBatches, test.expected, output)
+  n:        %v
+  expected: %v
+  actual:   %v
+`, test.n, test.expected, actual)
 		}
 	}
 
