@@ -4,53 +4,70 @@ import (
 	"fmt"
 	"slices"
 	"testing"
+	"time"
 )
 
-func Test(t *testing.T) {
-	type testCase struct {
-		n        int
-		expected []int
-	}
-	tests := []testCase{
-		{5, []int{0, 1, 1, 2, 3}},
-		{3, []int{0, 1, 1}},
-	}
-	if withSubmit {
-		tests = append(tests, []testCase{
-			{0, []int{}},
-			{1, []int{0}},
-			{7, []int{0, 1, 1, 2, 3, 5, 8}},
-		}...)
+func TestSaveBackups(t *testing.T) {
+	expectedLogs := []string{
+		"Nothing to do, waiting...",
+		"Nothing to do, waiting...",
+		"Taking a backup snapshot...",
+		"Nothing to do, waiting...",
+		"Nothing to do, waiting...",
+		"Taking a backup snapshot...",
+		"Nothing to do, waiting...",
+		"Taking a backup snapshot...",
+		"Nothing to do, waiting...",
+		"All backups saved!",
 	}
 
-	passCount := 0
-	failCount := 0
+	snapshotTicker := time.Tick(800 * time.Millisecond)
+	saveAfter := time.After(2800 * time.Millisecond)
+	logChan := make(chan string)
+	go saveBackups(snapshotTicker, saveAfter, logChan)
+	actualLogs := []string{}
+	for actualLog := range logChan {
+		fmt.Println(actualLog)
+		actualLogs = append(actualLogs, actualLog)
+	}
 
-	for _, test := range tests {
-		actual := concurrentFib(test.n)
-		if !slices.Equal(actual, test.expected) {
-			failCount++
-			t.Errorf(`
+	if !slices.Equal(expectedLogs, actualLogs) {
+		t.Errorf(`
 ---------------------------------
 Test Failed:
-  n:        %v
-  expected: %v
-  actual:   %v
-`, test.n, test.expected, actual)
-		} else {
-			passCount++
-			fmt.Printf(`
+expected:
+%v
+actual:
+%v
+`, sliceWithBullets(expectedLogs), sliceWithBullets(actualLogs))
+	} else {
+		fmt.Printf(`
 ---------------------------------
 Test Passed:
-  n:        %v
-  expected: %v
-  actual:   %v
-`, test.n, test.expected, actual)
-		}
+expected:
+%v
+actual:
+%v
+`, sliceWithBullets(expectedLogs), sliceWithBullets(actualLogs))
 	}
+}
 
-	fmt.Println("---------------------------------")
-	fmt.Printf("%d passed, %d failed\n", passCount, failCount)
+func sliceWithBullets[T any](slice []T) string {
+	if slice == nil {
+		return "  <nil>"
+	}
+	if len(slice) == 0 {
+		return "  []"
+	}
+	output := ""
+	for i, item := range slice {
+		form := "  - %#v\n"
+		if i == (len(slice) - 1) {
+			form = "  - %#v"
+		}
+		output += fmt.Sprintf(form, item)
+	}
+	return output
 }
 
 // withSubmit is set at compile time depending on which button is used to run the tests
