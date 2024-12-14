@@ -8,6 +8,31 @@ import (
 	"strings"
 )
 
+
+func countReports(numSentCh chan int) int {
+	n := 0
+	for {
+		if v , ok:= <- numSentCh; !ok {
+			break
+		} else {
+			n += v
+		}
+
+	}
+	return n
+}
+
+// don't touch below this line
+
+func sendReports(numBatches int, ch chan int) {
+	for i := 0; i < numBatches; i++ {
+		numReports := i*23 + 32%17
+		ch <- numReports
+	}
+	close(ch)
+}
+
+
 func addEmailsToQueue(emails []string) chan string {
 	ch := make(chan string, len(emails))
 	for i:= 0 ; i< len(emails); i++{
