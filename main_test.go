@@ -2,70 +2,61 @@ package main
 
 import (
 	"fmt"
-	"sync"
 	"testing"
 )
 
 func Test(t *testing.T) {
-	type testCase struct {
-		email string
-		count int
-	}
-	var tests = []testCase{
-		{"norman@bates.com", 23},
-		{"marion@bates.com", 67},
-	}
+	test(
+		t,
+		[]int{1, 2, 3, 4},
+		4,
+	)
+	test(
+		t,
+		[]string{"a", "b", "c", "d"},
+		"d",
+	)
 	if withSubmit {
-		tests = append(tests, []testCase{
-			{"lila@bates.com", 31},
-			{"sam@bates.com", 453},
-		}...)
+		test(
+			t,
+			[]int{},
+			0,
+		)
+		test(
+			t,
+			[]bool{true, false, true, true, false},
+			false,
+		)
 	}
 
-	passCount := 0
-	failCount := 0
+}
 
-	for _, test := range tests {
-		sc := safeCounter{
-			counts: make(map[string]int),
-			mu:     &sync.RWMutex{},
-		}
-		var wg sync.WaitGroup
-		for i := 0; i < test.count; i++ {
-			wg.Add(1)
-			go func(email string) {
-				sc.inc(email)
-				wg.Done()
-			}(test.email)
-		}
-		wg.Wait()
-
-		sc.mu.RLock()
-		defer sc.mu.RUnlock()
-		if output := sc.val(test.email); output != test.count {
-			failCount++
-			t.Errorf(`
+func test[T comparable](t *testing.T, s []T, expected T) {
+	if output := getLast(s); output != expected {
+		t.Errorf(`
 ---------------------------------
 Test Failed:
-  email: %v
-  count: %v
-  expected count: %v
-  actual count:   %v
-`, test.email, test.count, test.count, output)
-		} else {
-			passCount++
-			fmt.Printf(`
+  input:    %v
+  expected: %v
+  actual:   %v
+`,
+			s,
+			expected,
+			output,
+		)
+	} else {
+		fmt.Printf(`
 ---------------------------------
 Test Passed:
-  email: %v
-  count: %v
-  expected count: %v
-  actual count:   %v
-`, test.email, test.count, test.count, output)
-		}
+  input:    %v
+  expected: %v
+  actual:   %v
+`,
+			s,
+			expected,
+			output,
+		)
 	}
-
-	fmt.Printf("%d passed, %d failed\n", passCount, failCount)
 }
 
 // withSubmit is set at compile time depending on which button is used to run the tests

@@ -11,6 +11,15 @@ import (
 )
 
 
+func getLast[T any](s []T) T {
+	if len(s) == 0 {
+		var myZero T
+		return myZero
+	}
+	return s[len(s) - 1]
+}
+
+
 type safeCounter struct {
 	counts map[string]int
 	mu     *sync.RWMutex
@@ -129,7 +138,7 @@ func logSms(sms string) {
 func logEmail(email string) {
 	fmt.Println("Email:", email)
 }
-
+/*
 func test(sms []string, emails []string) {
 	fmt.Println("Starting...")
 
@@ -138,7 +147,7 @@ func test(sms []string, emails []string) {
 	logMessages(chEmails, chSms)
 	fmt.Println("===============================")
 }
-
+*/
 func sendToLogger(sms, emails []string) (chSms, chEmails chan string) {
 	chSms = make(chan string)
 	chEmails = make(chan string)
@@ -1000,6 +1009,7 @@ func main() {
 
 
 	rand.Seed(0)
+/*
 	test(
 		[]string{
 			"hi friend",
@@ -1026,5 +1036,6 @@ func main() {
 			"Can you believe this song?",
 		},
 	)
+*/
 }
 
