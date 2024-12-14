@@ -8,6 +8,14 @@ import (
 	"strings"
 )
 
+func addEmailsToQueue(emails []string) chan string {
+	ch := make(chan string, len(emails))
+	for i:= 0 ; i< len(emails); i++{
+		ch <- emails[i]
+	}
+	return ch
+}
+
 func waitForDBs(numDBs int, dbChan chan struct{}) {
 	for i:= 0; i< numDBs; i++ {
 		<-dbChan
