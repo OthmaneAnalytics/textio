@@ -5,98 +5,79 @@ import (
 	"testing"
 )
 
-func Test(t *testing.T) {
-	testBiller[org](
-		t,
-		orgBiller{Plan: "pro"},
-		org{Admin: user{UserEmail: "jaskier@oxenfurt.com"}, Name: "Oxenfurt"},
-		3000,
-		"jaskier@oxenfurt.com",
-	)
-	testBiller[user](
-		t,
-		userBiller{Plan: "basic"},
-		user{UserEmail: "vesemir@kaermorhen.com"},
-		50,
-		"vesemir@kaermorhen.com",
-	)
-	testBiller[user](
-		t,
-		userBiller{Plan: "pro"},
-		user{UserEmail: "zoltan@mahakam.com"},
-		100,
-		"zoltan@mahakam.com",
-	)
-	testBiller[org](
-		t,
-		orgBiller{Plan: "basic"},
-		org{Admin: user{UserEmail: "vernon@temeria.com"}, Name: "Temeria"},
-		2000,
-		"vernon@temeria.com",
-	)
-	testBiller[org](
-		t,
-		orgBiller{Plan: "pro"},
-		org{Admin: user{UserEmail: "fringilla@nilfgaard.com"}, Name: "Nilfgaard"},
-		3000,
-		"fringilla@nilfgaard.com",
-	)
-}
-
-func testBiller[C customer](
-	t *testing.T,
-	b biller[C],
-	c C,
-	expectedAmount float64,
-	expectedEmail string,
-) {
-	currentBill := b.Charge(c)
-	name := b.Name()
-	if currentBill.Amount != expectedAmount ||
-		currentBill.Customer.GetBillingEmail() != expectedEmail {
-		t.Errorf(`Test Failed:
-name:            %v
-biller Type:     %T,
-customer Type:   %T,
-customer:        %v
-expected amount: %v
-expected email:  %v
-actual amount:   %v
-actual email:    %v
----------------------------------
-`,
-			name,
-			b,
-			c,
-			c,
-			expectedAmount,
-			expectedEmail,
-			currentBill.Amount,
-			currentBill.Customer.GetBillingEmail(),
-		)
-	} else {
-		fmt.Printf(`Test Passed:
-name:            %v
-biller Type:     %T,
-customer Type:   %T,
-customer:        %v
-expected amount: %v
-expected email:  %v
-actual amount:   %v
-actual email:    %v
----------------------------------
-`,
-			name,
-			b,
-			c,
-			c,
-			expectedAmount,
-			expectedEmail,
-			currentBill.Amount,
-			currentBill.Customer.GetBillingEmail(),
-		)
+func TestHandleEmailBounce(t *testing.T) {
+	type testCase struct {
+		email           email
+		expectedError   string
+		expectedStatus  string
+		expectedBounces int
 	}
+	tests := []testCase{
+		{
+			email: email{
+				status:    "email_bounced",
+				recipient: &user{email: "bugs@acme.inc"},
+			},
+			expectedError:   "<nil>",
+			expectedStatus:  "email_bounced",
+			expectedBounces: 1,
+		},
+		{
+			email: email{
+				status:    "email_sent",
+				recipient: &user{email: "daffy@acme.inc"},
+			},
+			expectedError:   "error updating user status: invalid status: email_sent",
+			expectedStatus:  "",
+			expectedBounces: 0,
+		},
+	}
+	if withSubmit {
+		tests = append(tests, testCase{
+			email: email{
+				status:    "email_failed",
+				recipient: &user{email: "porky@acme.inc"},
+			},
+			expectedError:   "error updating user status: invalid status: email_failed",
+			expectedStatus:  "",
+			expectedBounces: 0,
+		})
+	}
+
+	passCount := 0
+	failCount := 0
+
+	for _, test := range tests {
+		a := &analytics{}
+		err := a.handleEmailBounce(test.email)
+		actualError := fmt.Sprintf("%v", err)
+		if actualError != test.expectedError {
+			failCount++
+			t.Errorf(`
+---------------------------------
+Test Failed:
+  status:    %v
+  recipient: %v
+  expected error:   %v
+  actual error:     %v
+`, test.email.status, test.email.recipient.email, test.expectedError, actualError)
+		} else {
+			passCount++
+			fmt.Printf(`
+---------------------------------
+Test Passed:
+  status:    %v
+  recipient: %v
+  expected error:   %v
+  actual error:     %v
+`, test.email.status, test.email.recipient.email, test.expectedError, actualError)
+		}
+	}
+
+	fmt.Println("---------------------------------")
+	fmt.Printf("%d passed, %d failed\n", passCount, failCount)
 }
 
+// withSubmit is set at compile time depending on which button is used to run the tests
 var withSubmit = true
 

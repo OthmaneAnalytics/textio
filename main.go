@@ -1,21 +1,33 @@
 package main
 
 import (
+/*
 	"unicode/utf8"
-	"fmt"
 	"time"
 	"errors"
 	"strings"
 	"math/rand"
 	"sync"
+*/
+	"fmt"
 )
 
+func (a *analytics) handleEmailBounce(em email) error {
+	err1 := em.recipient.updateStatus(em.status) 
+	if err1 != nil {
+		return fmt.Errorf("error updating user status: %w", err1)
+	}
+	err2 := a.track(em.status)
+	if err2 != nil {
+		return fmt.Errorf("error tracking user bounce: %w", err2)
+	}
+	return nil
+}
+/*
 type biller[C customer] interface {
 	Charge(C) bill
 	Name() string
 }
-
-// don't edit below this line
 
 type userBiller struct {
 	Plan string
@@ -169,7 +181,7 @@ func (sc safeCounter) slowIncrement(key string) {
 	tempCounter++
 	sc.counts[key] = tempCounter
 }
-
+*/
 /*
 type safeCounter struct {
 	counts map[string]int
@@ -203,7 +215,7 @@ func (sc safeCounter) slowVal(key string) int {
 }
 */
 
-
+/*
 func saveBackups(snapshotTicker, saveAfter <-chan time.Time, logChan chan string) {
 	for {
 		select {
@@ -262,7 +274,6 @@ func logSms(sms string) {
 func logEmail(email string) {
 	fmt.Println("Email:", email)
 }
-/*
 func test(sms []string, emails []string) {
 	fmt.Println("Starting...")
 
@@ -271,7 +282,7 @@ func test(sms []string, emails []string) {
 	logMessages(chEmails, chSms)
 	fmt.Println("===============================")
 }
-*/
+
 func sendToLogger(sms, emails []string) (chSms, chEmails chan string) {
 	chSms = make(chan string)
 	chEmails = make(chan string)
@@ -474,7 +485,7 @@ func getCounts(messagedUsers []string, validUsers map[string]int) {
 		}
 	}
 }
-/*
+
 func deleteIfNecessary(users map[string]user, name string) (deleted bool, err error) {
 	elem, ok := users[name]
 	if !ok {
@@ -506,7 +517,7 @@ func getUserMap(names []string, phoneNumbers []int) (map[string]user, error) {
 	}
 	return userMap, nil
 }
-*/
+
 
 
 func indexOfFirstBadWord(msg []string, badWords []string) int {
@@ -1133,7 +1144,7 @@ func main() {
 
 
 	rand.Seed(0)
-/*
+
 	test(
 		[]string{
 			"hi friend",
@@ -1160,6 +1171,6 @@ func main() {
 			"Can you believe this song?",
 		},
 	)
-*/
-}
 
+}
+*/
