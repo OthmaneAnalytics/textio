@@ -5,77 +5,64 @@ import (
 	"testing"
 )
 
-func TestHandleEmailBounce(t *testing.T) {
+func TestEmailStatus(t *testing.T) {
 	type testCase struct {
-		email           email
-		expectedError   string
-		expectedStatus  string
-		expectedBounces int
+		status   emailStatus
+		expected string
 	}
 	tests := []testCase{
-		{
-			email: email{
-				status:    "email_bounced",
-				recipient: &user{email: "bugs@acme.inc"},
-			},
-			expectedError:   "<nil>",
-			expectedStatus:  "email_bounced",
-			expectedBounces: 1,
-		},
-		{
-			email: email{
-				status:    "email_sent",
-				recipient: &user{email: "daffy@acme.inc"},
-			},
-			expectedError:   "error updating user status: invalid status: email_sent",
-			expectedStatus:  "",
-			expectedBounces: 0,
-		},
+		{emailBounced, "emailBounced"},
+		{emailInvalid, "emailInvalid"},
+		{emailDelivered, "emailDelivered"},
 	}
 	if withSubmit {
-		tests = append(tests, testCase{
-			email: email{
-				status:    "email_failed",
-				recipient: &user{email: "porky@acme.inc"},
-			},
-			expectedError:   "error updating user status: invalid status: email_failed",
-			expectedStatus:  "",
-			expectedBounces: 0,
-		})
+		tests = append(tests, testCase{emailOpened, "emailOpened"})
+		tests = append(tests, testCase{17, "Unknown"})
 	}
 
 	passCount := 0
 	failCount := 0
 
 	for _, test := range tests {
-		a := &analytics{}
-		err := a.handleEmailBounce(test.email)
-		actualError := fmt.Sprintf("%v", err)
-		if actualError != test.expectedError {
+		output := getEmailStatusName(test.status)
+		if output != test.expected {
 			failCount++
 			t.Errorf(`
 ---------------------------------
 Test Failed:
-  status:    %v
-  recipient: %v
-  expected error:   %v
-  actual error:     %v
-`, test.email.status, test.email.recipient.email, test.expectedError, actualError)
+  status:   %v
+  expected: %v
+  actual:   %v
+`, test.status, test.expected, output)
 		} else {
 			passCount++
 			fmt.Printf(`
 ---------------------------------
 Test Passed:
-  status:    %v
-  recipient: %v
-  expected error:   %v
-  actual error:     %v
-`, test.email.status, test.email.recipient.email, test.expectedError, actualError)
+  status:   %v
+  expected: %v
+  actual:   %v
+`, test.status, test.expected, output)
 		}
 	}
 
 	fmt.Println("---------------------------------")
 	fmt.Printf("%d passed, %d failed\n", passCount, failCount)
+}
+
+func getEmailStatusName(status emailStatus) string {
+	switch status {
+	case emailBounced:
+		return "emailBounced"
+	case emailInvalid:
+		return "emailInvalid"
+	case emailDelivered:
+		return "emailDelivered"
+	case emailOpened:
+		return "emailOpened"
+	default:
+		return "Unknown"
+	}
 }
 
 // withSubmit is set at compile time depending on which button is used to run the tests

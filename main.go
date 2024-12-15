@@ -12,6 +12,15 @@ import (
 	"fmt"
 )
 
+type emailStatus = int
+
+const (
+	emailBounced emailStatus = iota
+	emailInvalid
+	emailDelivered
+	emailOpened
+)
+
 func (a *analytics) handleEmailBounce(em email) error {
 	err1 := em.recipient.updateStatus(em.status) 
 	if err1 != nil {
